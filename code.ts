@@ -5,7 +5,7 @@ type Collection = {
 };
 
 // Initialize allCollections object
-const updatedCollections: Collection[] = [];
+const updatedTokenCollections: Collection[] = [];
 
 // Function to create JSON for variable in collection mode
 const createCollectionModeJson = async (
@@ -91,14 +91,13 @@ const rgbaToHex = (rgba: {
 };
 
 // Plugin execution
-// Plugin execution
 if (figma.editorType === "figma") {
   figma.showUI(__html__);
 
   figma.ui.resize(560, 420);
 
   figma.ui.onmessage = async (msg) => {
-    if (msg.type === "create-variables") {
+    if (msg.type === "create-tokens") {
       try {
         // Get all variable collections and store them in collections
         const collections =
@@ -106,7 +105,7 @@ if (figma.editorType === "figma") {
         // Loop through each collection
         for (const collection of collections) {
           // Create a new collection object for each iteration
-          const updatedCollection = { name: collection.name };
+          const updatedTokenCollection = { name: collection.name };
           // Loop through each variable IDs in the collection
           for (const variableId of collection.variableIds) {
             // Get the variable by ID and store it in variable
@@ -120,7 +119,7 @@ if (figma.editorType === "figma") {
                 await createCollectionModeJson(
                   variable,
                   collection.defaultModeId,
-                  updatedCollection
+                  updatedTokenCollection
                 );
               }
             } catch (error) {
@@ -129,13 +128,13 @@ if (figma.editorType === "figma") {
             }
           }
           // After processing all variables in the collection, add the collection to updatedCollections
-          updatedCollections.push(updatedCollection);
+          updatedTokenCollections.push(updatedTokenCollection);
         }
         // After all collections have been processed, you can do further processing or export them as JSON files
         // After processing all collections, send the data back to the UI
         figma.ui.postMessage({
-          type: "all-collections",
-          data: updatedCollections,
+          type: "all-token-collections",
+          data: updatedTokenCollections,
         });
       } catch (error) {
         // Handle error

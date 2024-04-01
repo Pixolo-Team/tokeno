@@ -159,7 +159,7 @@
 
   <script>
     document.getElementById("create").onclick = () => {
-      parent.postMessage({ pluginMessage: { type: "create-variables" } }, "*");
+      parent.postMessage({ pluginMessage: { type: "create-tokens" } }, "*");
     };
 
     document.getElementById("cancel").onclick = () => {
@@ -221,7 +221,7 @@
 
     // Listen for messages from the plugin
     window.addEventListener("message", (event) => {
-      if (event.data.pluginMessage.type === "all-collections") {
+      if (event.data.pluginMessage.type === "all-token-collections") {
         const updatedCollections = event.data.pluginMessage.data;
         document.getElementById("downloadTs").onclick = () => {
           updatedCollections.forEach((collection, index) => {
