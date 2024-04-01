@@ -99,7 +99,6 @@ if (figma.editorType === "figma") {
 
   figma.ui.onmessage = async (msg) => {
     if (msg.type === "create-variables") {
-      console.log("Creating variables");
       try {
         // Get all variable collections and store them in collections
         const collections =
@@ -125,8 +124,8 @@ if (figma.editorType === "figma") {
                 );
               }
             } catch (error) {
-              console.error("Error retrieving variable:", error);
               // Handle error
+              console.error("Error retrieving variable:", error);
             }
           }
           // After processing all variables in the collection, add the collection to updatedCollections
@@ -134,16 +133,14 @@ if (figma.editorType === "figma") {
         }
         // After all collections have been processed, you can do further processing or export them as JSON files
         // After processing all collections, send the data back to the UI
-        console.log("All collections:", updatedCollections);
         figma.ui.postMessage({
           type: "all-collections",
           data: updatedCollections,
         });
       } catch (error) {
-        console.error("Error retrieving collections:", error);
         // Handle error
+        console.error("Error retrieving collections:", error);
       }
     }
-    // figma.closePlugin();
   };
 }

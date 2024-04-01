@@ -194,8 +194,6 @@
       tsCode += tsNewCode;
       tsCode += ";\n";
 
-      console.log(tsCode);
-
       // Create blob and download file
       const blob = new Blob([tsCode], { type: "text/typescript" });
       const url = URL.createObjectURL(blob);
@@ -223,7 +221,6 @@
 
     // Listen for messages from the plugin
     window.addEventListener("message", (event) => {
-      console.log("hi", event);
       if (event.data.pluginMessage.type === "all-collections") {
         const updatedCollections = event.data.pluginMessage.data;
         document.getElementById("downloadTs").onclick = () => {
