@@ -1,0 +1,17 @@
+{
+  "name": "Test Plugin",
+  "id": "1351536737216242233",
+  "api": "1.0.0",
+  "main": "code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "editorType": ["figma", "figjam"],
+  "ui": "ui.html",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://fonts.gstatic.com",
+      "https://fonts.googleapis.com"
+    ]
+  },
+  "documentAccess": "dynamic-page"
+}
