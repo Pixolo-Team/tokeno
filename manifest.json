@@ -1,6 +1,6 @@
 {
-  "name": "Test Plugin",
-  "id": "1351536737216242233",
+  "name": "Tokeno",
+  "id": "1356651339805108935",
   "api": "1.0.0",
   "main": "code.js",
   "capabilities": [],
@@ -10,7 +10,8 @@
   "networkAccess": {
     "allowedDomains": [
       "https://fonts.gstatic.com",
-      "https://fonts.googleapis.com"
+      "https://fonts.googleapis.com",
+      "https://cdnjs.cloudflare.com"
     ]
   },
   "documentAccess": "dynamic-page"

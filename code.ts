@@ -1,11 +1,12 @@
 // Create all Collection Types
 type Collection = {
   name: string;
+  mode: string;
   [key: string]: object | string | number | boolean;
 };
 
 // Initialize allCollections object
-const updatedTokenCollections: Collection[] = [];
+const updatedCollections: Collection[] = [];
 
 // Function to create JSON for variable in collection mode
 const createCollectionModeJson = async (
@@ -28,6 +29,11 @@ const createCollectionModeJson = async (
     }
   }
 
+  if (typeof value === "number") {
+    // Remove decimal points from number values
+    value = Math.round(value);
+  }
+
   // Loop through each key in the keys array
   for (let i = 0; i < keys.length - 1; i++) {
     // If the key does not exist in the tempCollection, create it as an empty object
@@ -45,7 +51,6 @@ const createCollectionModeJson = async (
 
 // Function to parse value asynchronously
 const valueParser = async (value: VariableAlias | RGBA): Promise<string> => {
-  // Check if value is a VariableAlias
   if ("id" in value) {
     try {
       // Get the variable by ID and store it in variable
@@ -53,7 +58,7 @@ const valueParser = async (value: VariableAlias | RGBA): Promise<string> => {
       // If variable exists, get the collection
       if (variable) {
         const collection = await figma.variables.getVariableCollectionByIdAsync(
-          variable.variableCollectionId as string
+          variable.variableCollectionId
         );
         if (collection) {
           // If collection exists, parse the value and return it
@@ -97,49 +102,84 @@ if (figma.editorType === "figma") {
   figma.ui.resize(560, 420);
 
   figma.ui.onmessage = async (msg) => {
-    if (msg.type === "create-tokens") {
+    if (msg.type === "create-variables") {
       try {
         // Get all variable collections and store them in collections
         const collections =
           await figma.variables.getLocalVariableCollectionsAsync();
+
+        if (collections.length === 0) {
+          // Show error message
+          figma.ui.postMessage({
+            type: "error",
+            message: "No collections found. Please create a collection first.",
+          });
+          return;
+        }
         // Loop through each collection
         for (const collection of collections) {
-          // Create a new collection object for each iteration
-          const updatedTokenCollection = { name: collection.name };
-          // Loop through each variable IDs in the collection
-          for (const variableId of collection.variableIds) {
-            // Get the variable by ID and store it in variable
-            try {
-              const variable = await figma.variables.getVariableByIdAsync(
-                variableId
-              );
-              // If variable exists, create JSON for it
-              if (variable) {
-                // Create JSON for variable in collection mode
-                await createCollectionModeJson(
-                  variable,
-                  collection.defaultModeId,
-                  updatedTokenCollection
+          // Check if the collection only has a name
+          if (collection.variableIds.length === 0) {
+            const errorMessage = `Collection '${collection.name}' only has no variables.`;
+            // Show error message
+            figma.ui.postMessage({
+              type: "error",
+              message: errorMessage,
+            });
+            continue;
+          }
+
+          // Remove spaces from collection name and camelCase it
+          const collectionName = collection.name
+            .replace(/\s+/g, "")
+            .replace(/^(.)/, (match) => match.toLowerCase());
+
+          for (const mode of collection.modes) {
+            // Create a new collection object for each iteration
+            const updatedCollection = {
+              name: collectionName,
+              mode: mode.name,
+            };
+            // Loop through each variable IDs in the collection
+            for (const variableId of collection.variableIds) {
+              // Get the variable by ID and store it in variable
+              try {
+                const variable = await figma.variables.getVariableByIdAsync(
+                  variableId
                 );
+                // If variable exists, create JSON for it
+                if (variable) {
+                  // Create JSON for variable in collection mode
+                  await createCollectionModeJson(
+                    variable,
+                    mode.modeId,
+                    updatedCollection
+                  );
+                }
+              } catch (error) {
+                console.error("Error retrieving variable:", error);
+                // Handle error
               }
-            } catch (error) {
-              // Handle error
-              console.error("Error retrieving variable:", error);
             }
+            updatedCollections.push(updatedCollection);
           }
           // After processing all variables in the collection, add the collection to updatedCollections
-          updatedTokenCollections.push(updatedTokenCollection);
         }
+
+        // collectionToTypeScript(updatedCollections);
         // After all collections have been processed, you can do further processing or export them as JSON files
         // After processing all collections, send the data back to the UI
-        figma.ui.postMessage({
-          type: "all-token-collections",
-          data: updatedTokenCollections,
-        });
+        if (updatedCollections.length > 0) {
+          figma.ui.postMessage({
+            type: "all-collections",
+            data: updatedCollections,
+          });
+        }
       } catch (error) {
-        // Handle error
         console.error("Error retrieving collections:", error);
+        // Handle error
       }
     }
+    // figma.closePlugin();
   };
 }
