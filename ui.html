@@ -459,7 +459,7 @@ export { semantic, components };`;
           for (const subKey in value) {
             const subValue = value[subKey];
             emObj[subKey] =
-              typeof subValue === "number" ? subValue / 100 : subValue;
+              typeof subValue === "number" ? `${subValue}em` : subValue;
           }
 
           scssCode += convertCollectionToScss(
@@ -527,10 +527,9 @@ export { semantic, components };`;
         scssCode += `@import "../primitive";\n`;
         // Add an empty line for spacing
         scssCode += "\n";
-        scssCode += ":root {\n";
-        scssCode += `@media (prefers-color-scheme: ${
+        scssCode += `:root.${
           collection.mode === "dark" ? "dark" : "light"
-        }) {\n`;
+        } {\n`;
       } else if (collection.name === "primitive") {
         scssCode += ":root {\n";
       } else {
@@ -543,10 +542,9 @@ export { semantic, components };`;
         scssCode += `@import "../primitive";\n`;
         // Add an empty line for spacing
         scssCode += "\n";
-        scssCode += ":root {\n";
-        scssCode += `@media (prefers-color-scheme: ${
+        scssCode += `:root.${
           collection.mode === "dark" ? "dark" : "light"
-        }) {\n`;
+        } {\n`;
       }
     }
 
@@ -555,7 +553,6 @@ export { semantic, components };`;
 
     // Close the root block if prefix is empty
     if (prefix === "") {
-      collection.name !== "primitive" && (scssCode += "}\n");
       scssCode += "}\n";
     }
     return scssCode;
